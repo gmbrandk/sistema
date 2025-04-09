@@ -1,4 +1,5 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
+import { useAnimation } from "./AnimationContext";
 
 // Crear contexto
 const ClienteContext = createContext();
@@ -6,32 +7,51 @@ const ClienteContext = createContext();
 // Custom Hook para acceder al contexto
 export const useCliente = () => useContext(ClienteContext);
 
-// Proveedor del contexto
 export const ClienteProvider = ({ children }) => {
-  // Estado para almacenar los clientes y equipos en memoria
   const [clienteId, setClienteId] = useState(null);
-  const [clientes, setClientes] = useState([]); // Lista de clientes
-  const [equipos, setEquipos] = useState([]);   // Lista de equipos asociados a los clientes
+  const [clientes, setClientes] = useState(() => {
+    const storedClientes = localStorage.getItem("clientes");
+    return storedClientes ? JSON.parse(storedClientes) : [];
+  });
 
-  // Función para guardar un cliente
+  const [equipos, setEquipos] = useState(() => {
+    const storedEquipos = localStorage.getItem("equipos");
+    return storedEquipos ? JSON.parse(storedEquipos) : [];
+  });
+
+  // Guardar clientes en localStorage cada vez que cambien
+  useEffect(() => {
+    localStorage.setItem("clientes", JSON.stringify(clientes));
+  }, [clientes]);
+
+  useEffect(() => {
+    localStorage.setItem("equipos", JSON.stringify(equipos));
+  }, [equipos]);
+
   const guardarCliente = (cliente) => {
-    const fakeId = crypto.randomUUID(); // Genera un ID único
-    const clienteConId = { ...cliente, _id: fakeId }; // Lo añade al cliente
-    setClientes((prevClientes) => [...prevClientes, clienteConId]); // Guarda el cliente en memoria
-    setClienteId(fakeId); // Actualiza el clienteId
+    const fakeId = crypto.randomUUID();
+    const clienteConId = { ...cliente, _id: fakeId };
+    setClientes((prev) => [...prev, clienteConId]);
+    setClienteId(fakeId);
   };
 
-  // Función para guardar un equipo asociado a un cliente
   const guardarEquipo = (equipo, clienteId) => {
-    setEquipos((prevEquipos) => [
-      ...prevEquipos,
-      { ...equipo, clienteId },
+    setEquipos((prev) => [
+      ...prev,
+      { ...equipo, clienteId, _id: crypto.randomUUID() },
     ]);
     console.log(`Guardando equipo para cliente con ID: ${clienteId}`, equipo);
   };
 
   return (
-    <ClienteContext.Provider value={{ clienteId, clientes, equipos, setClienteId, guardarCliente, guardarEquipo }}>
+    <ClienteContext.Provider value={{
+      clienteId,
+      clientes,
+      equipos,
+      setClienteId,
+      guardarCliente,
+      guardarEquipo
+    }}>
       {children}
     </ClienteContext.Provider>
   );

@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCliente } from "../context/ClienteContext";
+import "../styles/forms.css";
 
 const EquipoForm = ({ clienteId }) => {
   const [formData, setFormData] = useState({
@@ -7,36 +8,51 @@ const EquipoForm = ({ clienteId }) => {
     tipo: "",
     estado: "",
     marca: "",
-    modelo: "",
+    modelo: ""
   });
 
   const { guardarEquipo } = useCliente();
 
+  useEffect(() => {
+    const storedData = localStorage.getItem("equipoForm");
+    if (storedData) {
+      setFormData(JSON.parse(storedData));
+    }
+  }, []);
+
+  useEffect(() => {
+
+    if(Object.values(formData).some(val => val !== "")) {
+      localStorage.setItem("equipoForm", JSON.stringify(formData));
+    }
+  }, [formData]);
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const updated = { ...formData, [e.target.name]: e.target.value }
+    setFormData(updated);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const equipo = { ...formData, _id: crypto.randomUUID() }; // Añadir ID único
-    guardarEquipo(equipo, clienteId); // Guardar el equipo en memoria
+    const equipo = { ...formData, _id: crypto.randomUUID() };
+    guardarEquipo(equipo, clienteId);
     alert("Equipo registrado (simulado)");
-    setFormData({ serial: "", tipo: "", estado: "", marca: "", modelo: "" }); // Limpiar formulario
+    setFormData({ serial: "", tipo: "", estado: "", marca: "", modelo: "" });
+    localStorage.removeItem("equipoForm");
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="form-card">
       <h2>Formulario de Equipo</h2>
       {["serial", "tipo", "estado", "marca", "modelo"].map((field) => (
         <input
           key={field}
           type="text"
           name={field}
-          placeholder={field}
+          placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
           onChange={handleChange}
           required
           value={formData[field]}
-          style={{ display: "block", marginBottom: "0.5rem", width: "100%" }}
         />
       ))}
       <button type="submit">Guardar Equipo</button>
