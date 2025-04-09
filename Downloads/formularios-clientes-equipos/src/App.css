@@ -1,0 +1,33 @@
+/* Estilos generales */
+.slider-container {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+.form-page {
+  flex: 1;
+  padding: 20px;
+  transition: opacity 0.5s ease;
+  opacity: 1;
+}
+
+.form-page.hidden {
+  opacity: 0;
+}
+
+.slider-container.slide {
+  transform: translateX(-100%);
+}
+
+/* Para animar el cambio de formularios */
+.slider-container.slide .form-page:first-child {
+  opacity: 0;
+}
+
+.slider-container.slide .form-page:last-child {
+  opacity: 1;
+}
+
+.hidden {
+  display: none;
+}
