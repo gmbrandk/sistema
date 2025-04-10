@@ -1,21 +1,17 @@
-import { ClienteProvider } from "./context/ClienteContext";
-import { AnimationProvider } from "./context/AnimationContext";
-import Slider from "./components/Slider";
-import Dashboard from "./components/Dashboard";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import DashboardPage from "./pages/DashboardPage";
 import "./App.css";
 
-function App() {
-  return (
-    <ClienteProvider>
-      <AnimationProvider>
-        <div className="app-wrapper">
-          <h1>Registro de Cliente y Equipo</h1>
-          <Slider />
-          <Dashboard />
-        </div>
-      </AnimationProvider>
-    </ClienteProvider>
-  );
+function App () {
+    return (
+      <Router>
+        <Routes>
+          <Route path="/" element={<HomePage/>}/>
+          <Route path="/dashboard" element={<DashboardPage />}/>
+        </Routes>
+      </Router>
+    );
 }
 
 export default App;

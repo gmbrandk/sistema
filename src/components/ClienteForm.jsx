@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useCliente } from "../context/ClienteContext";
+import Modal from "./Modal";
 import "../styles/forms.css";
 
-const ClienteForm = () => {
+
+const ClienteForm = ({setShowModal, showModal, setShowSlide}) => {
   const [formData, setFormData] = useState({
     nombre: "",
     identificacion: "",
@@ -36,29 +38,42 @@ const ClienteForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const clienteConId = { ...formData, _id: crypto.randomUUID() };
+    const clienteConId = { 
+      ...formData,
+       _id: crypto.randomUUID(),
+      createdAt: new Date().toISOString() };
     console.log("Datos enviados al guardarCliente:", clienteConId);
     guardarCliente(clienteConId);
     setFormData({ nombre: "", identificacion: "", telefono: "", email: "", direccion: "" });
     localStorage.removeItem("clienteForm"); // Limpiar storage después de guardar
+    setShowModal(true);
+    setShowSlide(false)
+    console.log("Modal mostrado: ", true);
   };
 
+  const handleModalClose = () => {
+    setShowModal(false)
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="form-card">
-      <h2>Formulario de Cliente</h2>
-      {["nombre", "identificacion", "telefono", "email", "direccion"].map((field) => (
-        <input
-          key={field}
-          type="text"
-          name={field}
-          placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-          onChange={handleChange}
-          required
-          value={formData[field]}
-        />
-      ))}
-      <button type="submit">Guardar Cliente</button>
-    </form>
+      <div>
+        <form onSubmit={handleSubmit} className="form-card">
+        <h2>Formulario de Cliente</h2>
+        {["nombre", "identificacion", "telefono", "email", "direccion"].map((field) => (
+          <input
+            key={field}
+            type="text"
+            name={field}
+            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+            onChange={handleChange}
+            required
+            value={formData[field]}
+          />
+        ))}
+        <button type="submit">Guardar Cliente</button>
+        <Modal showModal={showModal} closeModal={handleModalClose} />
+      </form>
+    </div>
   );
 };
 

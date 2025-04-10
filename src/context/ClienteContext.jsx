@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, useEffect } from "react";
-import { useAnimation } from "./AnimationContext";
+//import { useAnimation } from "./AnimationContext";
 
 // Crear contexto
 const ClienteContext = createContext();
@@ -9,6 +9,7 @@ export const useCliente = () => useContext(ClienteContext);
 
 export const ClienteProvider = ({ children }) => {
   const [clienteId, setClienteId] = useState(null);
+  const [animationId, setAnimationId] = useState(null);
   const [clientes, setClientes] = useState(() => {
     const storedClientes = localStorage.getItem("clientes");
     return storedClientes ? JSON.parse(storedClientes) : [];
@@ -28,11 +29,18 @@ export const ClienteProvider = ({ children }) => {
     localStorage.setItem("equipos", JSON.stringify(equipos));
   }, [equipos]);
 
+  useEffect(() => {
+    if (clienteId) {
+      setAnimationId(clienteId); // Actualiza animación cuando se crea cliente
+    }
+  }, [clienteId]);
+
   const guardarCliente = (cliente) => {
     const fakeId = crypto.randomUUID();
     const clienteConId = { ...cliente, _id: fakeId };
     setClientes((prev) => [...prev, clienteConId]);
     setClienteId(fakeId);
+    localStorage.setItem("clienteId", fakeId); // 👈 Persistir
   };
 
   const guardarEquipo = (equipo, clienteId) => {
@@ -43,14 +51,30 @@ export const ClienteProvider = ({ children }) => {
     console.log(`Guardando equipo para cliente con ID: ${clienteId}`, equipo);
   };
 
+  const resetFlujo = () => {
+    console.log("Limpiando clienteId del localStorage:", localStorage.getItem("clienteId"));
+    localStorage.removeItem("clienteId");
+    setClienteId(null);
+  };
+
+  const resetAnimacion = () => {
+    console.log("Limpiando animationId del localStorage:", localStorage.getItem("animationId"));
+    localStorage.removeItem("animationId");
+    setAnimationId(null);
+  };
+  
+  
   return (
     <ClienteContext.Provider value={{
       clienteId,
       clientes,
       equipos,
+      animationId,
       setClienteId,
       guardarCliente,
-      guardarEquipo
+      guardarEquipo,
+      resetFlujo,
+      resetAnimacion
     }}>
       {children}
     </ClienteContext.Provider>

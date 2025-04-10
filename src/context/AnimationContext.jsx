@@ -14,6 +14,13 @@ export const AnimationProvider = ({ children }) => {
     setAnimationId(clienteId); // Actualiza animationId cuando clienteId cambie
   }, [clienteId]);
 
+  useEffect(() => {
+    const storedClienteId = localStorage.getItem("clienteId");
+    if (storedClienteId) {
+      setAnimationId(storedClienteId); // ✅ Mantener estado
+    }
+  }, []);
+
   return (
     <AnimationContext.Provider value={{ animationId, setAnimationId, clienteId }}>
       {children}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useCliente } from "../context/ClienteContext";
 import "../styles/forms.css";
+import { useNavigate } from "react-router-dom";
 
 const EquipoForm = ({ clienteId }) => {
   const [formData, setFormData] = useState({
@@ -11,7 +12,8 @@ const EquipoForm = ({ clienteId }) => {
     modelo: ""
   });
 
-  const { guardarEquipo } = useCliente();
+  const { guardarEquipo, resetFlujo, resetAnimacion } = useCliente();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedData = localStorage.getItem("equipoForm");
@@ -37,8 +39,15 @@ const EquipoForm = ({ clienteId }) => {
     const equipo = { ...formData, _id: crypto.randomUUID() };
     guardarEquipo(equipo, clienteId);
     alert("Equipo registrado (simulado)");
+    
     setFormData({ serial: "", tipo: "", estado: "", marca: "", modelo: "" });
     localStorage.removeItem("equipoForm");
+
+    setTimeout(() => {
+      resetFlujo();
+      resetAnimacion();
+      navigate("/dashboard");
+    }, 800); // Espera 800ms para que se complete la animación si tienes una
   };
 
   return (
