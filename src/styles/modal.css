@@ -21,17 +21,5 @@
     border-radius: 8px;
     max-width: 500px;
     width: 100%;
-    animation: modalAppear 0.3s ease-out;
   }
   
-  /* Animación de aparición del modal */
-@keyframes modalAppear {
-    from {
-      transform: scale(0.7);
-      opacity: 0;
-    }
-    to {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
