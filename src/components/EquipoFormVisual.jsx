@@ -1,16 +1,70 @@
-import styles from "../styles/EquipoFormVisual.module.css";
+import { useState, useEffect } from "react";
+import { useCliente } from "../context/ClienteContext";
+import { useNavigate } from "react-router-dom";
+import styles from "../styles/formCard.module.css";
 
 const EquipoFormVisual = () => {
+    const [formData, setFormData] = useState({
+      tipo:"",
+      marca:"",
+      modelo:"",
+      serial:""
+    });
+  
+    const { guardarEquipo, resetFlujo, resetAnimacion } = useCliente();
+    const navigate = useNavigate();
+  
+    useEffect(() => {
+      const storedData = localStorage.getItem("equipoForm");
+      if (storedData) {
+        setFormData(JSON.parse(storedData));
+      }
+    }, []);
+  
+    useEffect(() => {
+  
+      if(Object.values(formData).some(val => val !== "")) {
+        localStorage.setItem("equipoForm", JSON.stringify(formData));
+      }
+    }, [formData]);
+  
+    const handleChange = (e) => {
+      const updated = { ...formData, [e.target.name]: e.target.value }
+      setFormData(updated);
+    };
+  
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      const equipo = { ...formData, _id: crypto.randomUUID() };
+      guardarEquipo(equipo, clienteId);
+      alert("Equipo registrado (simulado)");
+      
+      setFormData({ serial: "", tipo: "", estado: "", marca: "", modelo: "" });
+      localStorage.removeItem("equipoForm");
+  
+      setTimeout(() => {
+        resetFlujo();
+        resetAnimacion();
+        navigate("/dashboard");
+      }, 800); // Espera 800ms para que se complete la animación si tienes una
+    };
+    
   return (
-    <div className={styles.formWrapper}>
+    <div className={styles.formWrapper} onSubmit={handleSubmit}>
       <form className={styles.formCard}>
         <h2>Formulario de Equipo</h2>
-        <input type="text" name="tipo" placeholder="Tipo de equipo" required />
-        <input type="text" name="marca" placeholder="Marca" required />
-        <input type="text" name="modelo" placeholder="Modelo" required />
-        <input type="text" name="serial" placeholder="Número de serie" required />
-        <input type="text" name="descripcion" placeholder="Descripción" required />
-        <button type="submit">Guardar Equipo</button>
+        {["tipo", "marca", "modelo","serial"].map((field) => (
+        <input
+          key={field}
+          type="text"
+          name={field}
+          placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+          onChange={handleChange}
+          required
+          value={formData[field]}
+        />
+        ))}
+        <button>Guardar Equipo</button>
       </form>
     </div>
   );
