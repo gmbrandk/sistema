@@ -1,0 +1,6 @@
+body, html {
+    overflow-x: hidden; /* Elimina cualquier desplazamiento horizontal */
+    width: 100%; /* Asegura que no haya un desbordamiento */
+  }
+  
+  
