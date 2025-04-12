@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useCliente } from "../context/ClienteContext";
-import { useAnimation } from "../context/AnimationContext";
 import ClienteFormVisual from "../components/ClienteFormVisual";
 import EquipoFormVisual from "../components/EquipoFormVisual";
 import styles from "../styles/formCarousel.module.css";
@@ -11,87 +10,77 @@ const CarouselForm = () => {
   const [direction, setDirection] = useState(1);
   const [isMounted, setIsMounted] = useState(false);
 
-  // Acceso a datos y métodos desde ClienteContext
-  const {
-    clienteId,
-    guardarCliente,
-    guardarEquipo,
-    resetFlujo
-  } = useCliente();
+  const { clienteId } = useCliente();
 
-  // Control de animación con AnimationContext
-  const { setAnimationId } = useAnimation();
-
-  // Formularios y variantes personalizados por formulario
   const forms = [
     {
       id: "cliente",
       component: <ClienteFormVisual />,
       variants: {
-        enter: {
-          x: "0%", // Cliente aparece directamente (sin transición horizontal)
-          opacity: 1,
-          position: "relative"
-        },
-        center: {
-          x: "0%",
-          opacity: 1,
-          position: "relative"
-        },
-        exit: {
-          x: "-100%", // Cliente se desliza hacia la izquierda
-          opacity: 0,
-          position: "absolute"
-        }
+        enter: { x: "0%", opacity: 1, position: "relative" },
+        center: { x: "0%", opacity: 1, position: "relative" },
+        exit: { x: "-100%", opacity: 0, position: "absolute" }
       }
     },
     {
       id: "equipo",
       component: <EquipoFormVisual />,
       variants: {
-        enter: {
-          x: "100%", // Equipo aparece desde la derecha
-          opacity: 0,
-          position: "absolute"
-        },
-        center: {
-          x: "0%",
-          opacity: 1,
-          position: "relative"
-        },
-        exit: {
-          x: "100%", // Sale hacia la derecha (sin retroceder)
-          opacity: 0,
-          position: "absolute"
-        }
+        enter: { x: "100%", opacity: 0, position: "absolute" },
+        center: { x: "0%", opacity: 1, position: "relative" },
+        exit: { x: "100%", opacity: 0, position: "absolute" }
       }
     }
   ];
 
-  // Navegación entre formularios
   const nextSlide = () => {
     if (currentIndex < forms.length - 1) {
+      const newIndex = currentIndex + 1;
+      console.log("➡️ [Carousel] Botón siguiente, cambiando a índice:", newIndex);
       setDirection(1);
-      setCurrentIndex(currentIndex + 1);
+      setCurrentIndex(newIndex);
+      localStorage.setItem("carouselIndex", newIndex);
     }
   };
 
   const prevSlide = () => {
     if (currentIndex > 0) {
+      const newIndex = currentIndex - 1;
+      console.log("⬅️ [Carousel] Botón atrás, cambiando a índice:", newIndex);
       setDirection(-1);
-      setCurrentIndex(currentIndex - 1);
+      setCurrentIndex(newIndex);
+      localStorage.setItem("carouselIndex", newIndex);
     }
   };
 
-  // Control para evitar que la animación inicial sea abrupta
   useEffect(() => {
     setIsMounted(true);
+    const storedIndex = localStorage.getItem("carouselIndex");
+    const storedClienteId = localStorage.getItem("clienteId");
+    console.log("📦 [Carousel] Montando componente...");
+    console.log("📦 Índice guardado:", storedIndex);
+    console.log("📦 clienteId guardado:", storedClienteId);
+
+    if (storedIndex !== null) {
+      setCurrentIndex(parseInt(storedIndex, 10));
+    }
   }, []);
+
+  useEffect(() => {
+    console.log("🎯 [Carousel] clienteId cambió:", clienteId);
+    if (clienteId && currentIndex === 0) {
+      console.log("✅ clienteId detectado. Avanzando al formulario de equipo...");
+      nextSlide();
+    } else if (!clienteId && currentIndex === 1) {
+      console.log("⚠️ clienteId es null pero estamos en paso 1. Regresando a cliente...");
+      prevSlide();
+    }
+  }, [clienteId]);
 
   return (
     <div className={styles.carouselContainer}>
-      <button 
-        onClick={prevSlide} 
+      <button
+        onClick={prevSlide}
         disabled={currentIndex === 0}
         className={`${styles.carouselArrow} ${styles.left}`}
       >
@@ -99,6 +88,9 @@ const CarouselForm = () => {
       </button>
 
       <div className={styles.carouselInner}>
+        <p style={{ fontSize: "12px", color: "gray", textAlign: "center" }}>
+          Paso actual (debug): {currentIndex}
+        </p>
         {forms.map((form, index) => {
           const isActive = index === currentIndex;
 
@@ -118,8 +110,8 @@ const CarouselForm = () => {
         })}
       </div>
 
-      <button 
-        onClick={nextSlide} 
+      <button
+        onClick={nextSlide}
         disabled={currentIndex === forms.length - 1}
         className={`${styles.carouselArrow} ${styles.right}`}
       >

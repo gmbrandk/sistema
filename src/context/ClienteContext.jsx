@@ -20,6 +20,24 @@ export const ClienteProvider = ({ children }) => {
     return storedEquipos ? JSON.parse(storedEquipos) : [];
   });
 
+  // Restaurar clienteId desde localStorage
+  useEffect(() => {
+    const storedId = localStorage.getItem("clienteId");
+    if (storedId) {
+      console.log("Restaurando clienteId desde localStorage:", storedId);
+      setClienteId(storedId);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (clienteId) {
+      console.log("ClienteId listo para asociar equipo:", clienteId);
+    } else {
+      console.warn("clienteId es null. Probablemente aún no se ha restaurado.");
+    }
+  }, [clienteId]);
+  
+
   // Guardar clientes en localStorage cada vez que cambien
   useEffect(() => {
     localStorage.setItem("clientes", JSON.stringify(clientes));
@@ -38,12 +56,19 @@ export const ClienteProvider = ({ children }) => {
   const guardarCliente = (cliente) => {
     const fakeId = crypto.randomUUID();
     const clienteConId = { ...cliente, _id: fakeId };
+    console.log("💾 [ClienteContext] guardando cliente:", clienteConId);
     setClientes((prev) => [...prev, clienteConId]);
     setClienteId(fakeId);
     localStorage.setItem("clienteId", fakeId); // 👈 Persistir
   };
 
   const guardarEquipo = (equipo, clienteId) => {
+    console.log("💾 [ClienteContext] guardando equipo para cliente:", clienteId, equipo);
+    
+    if (!clienteId) {
+      console.error('No hay clienteId disponible');
+      return;
+    }
     setEquipos((prev) => [
       ...prev,
       { ...equipo, clienteId, _id: crypto.randomUUID() },

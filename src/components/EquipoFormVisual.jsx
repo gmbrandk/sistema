@@ -11,7 +11,7 @@ const EquipoFormVisual = () => {
       serial:""
     });
   
-    const { guardarEquipo, resetFlujo, resetAnimacion } = useCliente();
+    const { clienteId, guardarEquipo, resetFlujo, resetAnimacion } = useCliente();
     const navigate = useNavigate();
   
     useEffect(() => {
@@ -35,6 +35,12 @@ const EquipoFormVisual = () => {
   
     const handleSubmit = (e) => {
       e.preventDefault();
+
+      if (!clienteId) {
+        alert("Debe registrar un cliente primero.");
+        return;
+      }
+
       const equipo = { ...formData, _id: crypto.randomUUID() };
       guardarEquipo(equipo, clienteId);
       alert("Equipo registrado (simulado)");
@@ -50,8 +56,8 @@ const EquipoFormVisual = () => {
     };
     
   return (
-    <div className={styles.formWrapper} onSubmit={handleSubmit}>
-      <form className={styles.formCard}>
+    <div className={styles.formWrapper} >
+      <form className={styles.formCard} onSubmit={handleSubmit}>
         <h2>Formulario de Equipo</h2>
         {["tipo", "marca", "modelo","serial"].map((field) => (
         <input
