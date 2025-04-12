@@ -88,6 +88,11 @@ export const ClienteProvider = ({ children }) => {
     setAnimationId(null);
   };
   
+  const finalizarRegistro = () => {
+    console.log("🎉 Registro finalizado. Limpiando clienteId.");
+    localStorage.removeItem("clienteId");
+    setClienteId(null);
+  };
   
   return (
     <ClienteContext.Provider value={{
@@ -99,7 +104,8 @@ export const ClienteProvider = ({ children }) => {
       guardarCliente,
       guardarEquipo,
       resetFlujo,
-      resetAnimacion
+      resetAnimacion,
+      finalizarRegistro
     }}>
       {children}
     </ClienteContext.Provider>

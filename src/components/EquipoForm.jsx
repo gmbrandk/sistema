@@ -12,7 +12,7 @@ const EquipoForm = ({ clienteId }) => {
     modelo: ""
   });
 
-  const { guardarEquipo, resetFlujo, resetAnimacion } = useCliente();
+  const { guardarEquipo, resetFlujo, resetAnimacion, finalizarRegistro } = useCliente();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,6 +44,7 @@ const EquipoForm = ({ clienteId }) => {
     localStorage.removeItem("equipoForm");
 
     setTimeout(() => {
+      finalizarRegistro();
       resetFlujo();
       resetAnimacion();
       navigate("/dashboard");
