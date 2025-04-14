@@ -1,17 +1,17 @@
-import { ClienteProvider } from "../context/ClienteContext";
+import { RegistroProvider } from "../context/RegistroContext";
 import { AnimationProvider } from "../context/AnimationContext";
 import Slider from "../components/Slider";
 
 function HomePage() {
   return (
-    <ClienteProvider>
+    <RegistroProvider>
       <AnimationProvider>
         <div className="app-wrapper">
           <h1>Registro de Cliente y Equipo</h1>
           <Slider />
         </div>
       </AnimationProvider>
-    </ClienteProvider>
+    </RegistroProvider>
   );
 }
 

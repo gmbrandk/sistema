@@ -1,76 +1,81 @@
 import { useState, useEffect } from "react";
-import { useCliente } from "../context/ClienteContext";
-import { useNavigate } from "react-router-dom";
+import { useRegistro } from "../context/RegistroContext";
 import styles from "../styles/formCard.module.css";
 
 const EquipoFormVisual = () => {
-    const [formData, setFormData] = useState({
-      tipo:"",
-      marca:"",
-      modelo:"",
-      serial:""
-    });
-  
-    const { clienteId, guardarEquipo, resetFlujo, resetAnimacion } = useCliente();
-    const navigate = useNavigate();
-  
-    useEffect(() => {
-      const storedData = localStorage.getItem("equipoForm");
-      if (storedData) {
-        setFormData(JSON.parse(storedData));
-      }
-    }, []);
-  
-    useEffect(() => {
-  
-      if(Object.values(formData).some(val => val !== "")) {
-        localStorage.setItem("equipoForm", JSON.stringify(formData));
-      }
-    }, [formData]);
-  
-    const handleChange = (e) => {
-      const updated = { ...formData, [e.target.name]: e.target.value }
-      setFormData(updated);
-    };
-  
-    const handleSubmit = (e) => {
-      e.preventDefault();
+  const [formData, setFormData] = useState({
+    tipo: "",
+    marca: "",
+    modelo: "",
+    serial: "",
+  });
 
-      if (!clienteId) {
-        alert("Debe registrar un cliente primero.");
-        return;
-      }
+  const [isFormValid, setIsFormValid] = useState(false); // Estado para verificar si el formulario es válido
 
-      const equipo = { ...formData, _id: crypto.randomUUID() };
-      guardarEquipo(equipo, clienteId);
-      alert("Equipo registrado (simulado)");
-      
-      setFormData({ serial: "", tipo: "", estado: "", marca: "", modelo: "" });
-      localStorage.removeItem("equipoForm");
-  
-      setTimeout(() => {
-        resetFlujo();
-        resetAnimacion();
-        navigate("/dashboard");
-      }, 800); // Espera 800ms para que se complete la animación si tienes una
-    };
-    
+  const { clienteId, guardarEquipo } = useRegistro();
+
+  // Recuperar datos del localStorage al cargar
+  useEffect(() => {
+    const storedData = localStorage.getItem("equipoForm");
+    if (storedData) {
+      setFormData(JSON.parse(storedData));
+    }
+  }, []);
+
+  // Guardar automáticamente en localStorage cuando el formulario cambia
+  useEffect(() => {
+    if (Object.values(formData).some((val) => val.trim() !== "")) {
+      localStorage.setItem("equipoForm", JSON.stringify(formData));
+    }
+  }, [formData]);
+
+  // Verificar si el formulario es válido (todos los campos llenos)
+  useEffect(() => {
+    const isValid = Object.values(formData).every((val) => val.trim() !== "");
+    setIsFormValid(isValid);
+  }, [formData]);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!clienteId) {
+      alert("Debe registrar un cliente primero.");
+      return;
+    }
+
+    guardarEquipo(formData, clienteId);
+
+    // Aquí se podría manejar el avance a la siguiente sección del formulario (Orden de Servicio)
+    // Para eso puedes actualizar un estado o utilizar algún tipo de navegación.
+  };
+
   return (
-    <div className={styles.formWrapper} >
+    <div className={styles.formWrapper}>
       <form className={styles.formCard} onSubmit={handleSubmit}>
         <h2>Formulario de Equipo</h2>
-        {["tipo", "marca", "modelo","serial"].map((field) => (
-        <input
-          key={field}
-          type="text"
-          name={field}
-          placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-          onChange={handleChange}
-          required
-          value={formData[field]}
-        />
+
+        {[ 
+          { name: "tipo", placeholder: "Tipo de equipo" },
+          { name: "marca", placeholder: "Marca" },
+          { name: "modelo", placeholder: "Modelo" },
+          { name: "serial", placeholder: "Número de serie" }
+        ].map(({ name, placeholder }) => (
+          <input
+            key={name}
+            type="text"
+            name={name}
+            placeholder={placeholder}
+            value={formData[name]}
+            onChange={handleChange}
+            required
+          />
         ))}
-        <button>Guardar Equipo</button>
+
+        <button type="submit" disabled={!isFormValid}>Siguiente</button>
       </form>
     </div>
   );

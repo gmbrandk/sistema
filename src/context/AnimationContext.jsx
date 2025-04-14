@@ -1,13 +1,13 @@
 // AnimationContext.js
 import { createContext, useState, useContext, useEffect } from "react";
-import { useCliente } from "./ClienteContext"; // Importa ClienteContext
+import { useRegistro } from "./RegistroContext";
 
 const AnimationContext = createContext();
 
 export const useAnimation = () => useContext(AnimationContext);
 
 export const AnimationProvider = ({ children }) => {
-  const { clienteId } = useCliente(); // Obtener el clienteId desde ClienteContext
+  const { clienteId } = useRegistro(); // Obtener el clienteId desde ClienteContext
   const [animationId, setAnimationId] = useState(clienteId); // Usa el clienteId en AnimationContext
 
   useEffect(() => {

@@ -1,10 +1,10 @@
-import Dashboard from "../components/Dashboard";
+import OrdenReciente from "../components/OrdenReciente";
 import { RegistroProvider } from "../context/RegistroContext";
 
 function DashboardPage () {
     return (
         <RegistroProvider>
-             <Dashboard />
+             <OrdenReciente />
         </RegistroProvider>
        
     )

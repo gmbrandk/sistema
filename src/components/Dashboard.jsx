@@ -1,10 +1,10 @@
-import { useCliente } from "../context/ClienteContext";
+import { useRegistro } from "../context/RegistroContext";
 import { useState } from "react";
 import "../styles/dashboard.css"; // Asegúrate de importar los estilos
 import { FaCogs } from "react-icons/fa";
 
 const Dashboard = () => {
-  const { clientes, equipos } = useCliente();
+  const { clientes, equipos } = useRegistro();
   const [devMode, setDevMode] = useState(false); // Estado para activar/desactivar el modo desarrollador
   
   const toggleDevMode = () => {

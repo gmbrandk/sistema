@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useCliente } from "../context/ClienteContext";
+import { useRegistro } from "../context/RegistroContext";
 import Modal from "./Modal";
 import "../styles/forms.css";
 

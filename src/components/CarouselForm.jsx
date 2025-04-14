@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { useCliente } from "../context/ClienteContext";
+import { useRegistro } from "../context/RegistroContext";
 import ClienteFormVisual from "../components/ClienteFormVisual";
 import EquipoFormVisual from "../components/EquipoFormVisual";
+import OrdenServicioForm from "../components/OrdenServicioForm";
 import styles from "../styles/formCarousel.module.css";
 
 const CarouselForm = () => {
@@ -10,72 +11,100 @@ const CarouselForm = () => {
   const [direction, setDirection] = useState(1);
   const [isMounted, setIsMounted] = useState(false);
 
-  const { clienteId } = useCliente();
+  const { clienteId, equipoId } = useRegistro();
 
   const forms = [
-    {
-      id: "cliente",
-      component: <ClienteFormVisual />,
-      variants: {
-        enter: { x: "0%", opacity: 1, position: "relative" },
-        center: { x: "0%", opacity: 1, position: "relative" },
-        exit: { x: "-100%", opacity: 0, position: "absolute" }
-      }
-    },
-    {
-      id: "equipo",
-      component: <EquipoFormVisual />,
-      variants: {
-        enter: { x: "100%", opacity: 0, position: "absolute" },
-        center: { x: "0%", opacity: 1, position: "relative" },
-        exit: { x: "100%", opacity: 0, position: "absolute" }
-      }
-    }
+    { id: "cliente", component: <ClienteFormVisual /> },
+    { id: "equipo", component: <EquipoFormVisual /> },
+    { id: "orden", component: <OrdenServicioForm /> }
   ];
+
+  // 🔁 Posicionamiento dinámico con respecto al índice actual
+  const getSlideVariants = (index) => {
+    const offset = (index - currentIndex) * 100;
+    return {
+      enter: {
+        x: `${offset}%`,
+        opacity: 0,
+        position: "absolute"
+      },
+      center: {
+        x: "0%",
+        opacity: 1,
+        position: "relative"
+      },
+      exit: {
+        x: `${offset}%`,
+        opacity: 0,
+        position: "absolute"
+      }
+    };
+  };
 
   const nextSlide = () => {
     if (currentIndex < forms.length - 1) {
       const newIndex = currentIndex + 1;
-      console.log("➡️ [Carousel] Botón siguiente, cambiando a índice:", newIndex);
       setDirection(1);
       setCurrentIndex(newIndex);
       localStorage.setItem("carouselIndex", newIndex);
+      console.log(`Siguiente slide: índice actual ${currentIndex} -> nuevo índice ${newIndex}, dirección: derecha`);
     }
   };
 
   const prevSlide = () => {
     if (currentIndex > 0) {
       const newIndex = currentIndex - 1;
-      console.log("⬅️ [Carousel] Botón atrás, cambiando a índice:", newIndex);
       setDirection(-1);
       setCurrentIndex(newIndex);
       localStorage.setItem("carouselIndex", newIndex);
+      //console.log(`Anterior slide: índice actual ${currentIndex} -> nuevo índice ${newIndex}, dirección: izquierda`);
     }
   };
 
   useEffect(() => {
     setIsMounted(true);
     const storedIndex = localStorage.getItem("carouselIndex");
-    const storedClienteId = localStorage.getItem("clienteId");
-    console.log("📦 [Carousel] Montando componente...");
-    console.log("📦 Índice guardado:", storedIndex);
-    console.log("📦 clienteId guardado:", storedClienteId);
-
     if (storedIndex !== null) {
       setCurrentIndex(parseInt(storedIndex, 10));
     }
   }, []);
 
   useEffect(() => {
-    console.log("🎯 [Carousel] clienteId cambió:", clienteId);
-    if (clienteId && currentIndex === 0) {
-      console.log("✅ clienteId detectado. Avanzando al formulario de equipo...");
-      nextSlide();
-    } else if (!clienteId && currentIndex === 1) {
-      console.log("⚠️ clienteId es null pero estamos en paso 1. Regresando a cliente...");
-      prevSlide();
+    console.log("[DEBUG] clienteId:", clienteId);
+    console.log("[DEBUG] equipoId:", equipoId);
+    console.log("[DEBUG] currentIndex:", currentIndex);
+  
+    switch (currentIndex) {
+      case 0:
+        if (clienteId) {
+          console.log("[ANIMACIÓN] Cliente registrado → avanzar a formulario de equipo");
+          nextSlide();
+        }
+        break;
+  
+      case 1:
+        if (!clienteId) {
+          console.log("[ANIMACIÓN] Cliente eliminado → volver a formulario de cliente");
+          prevSlide();
+        } else if (equipoId) {
+          console.log("[ANIMACIÓN] Equipo registrado → avanzar a formulario de orden");
+          nextSlide();
+        }
+        break;
+  
+      case 2:
+        if (!equipoId) {
+          console.log("[ANIMACIÓN] Equipo eliminado → volver a formulario de equipo");
+          prevSlide();
+        }
+        break;
+  
+      default:
+        break;
     }
-  }, [clienteId]);
+  }, [clienteId, equipoId, currentIndex]);
+  
+  
 
   return (
     <div className={styles.carouselContainer}>
@@ -91,18 +120,24 @@ const CarouselForm = () => {
         <p style={{ fontSize: "12px", color: "gray", textAlign: "center" }}>
           Paso actual (debug): {currentIndex}
         </p>
+
         {forms.map((form, index) => {
           const isActive = index === currentIndex;
+          const relativeX = `${(index - currentIndex) * 100}%`;
+
+          // Log para ver posición de cada formulario
+          //console.log(`Formulario ${form.id} renderizado: ${isActive ? 'activo' : 'no activo'}, x: ${relativeX}`);
 
           return (
             <motion.div
               key={form.id}
-              custom={direction}
-              variants={form.variants}
-              initial={isMounted ? (isActive ? "center" : false) : "enter"}
+              custom={index}
+              variants={getSlideVariants(index)}
+              initial={isMounted ? (isActive ? "center" : "enter") : "enter"}
               animate={isActive ? "center" : "exit"}
+              exit="exit"
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className={styles.carouselItem}
+              className={`${styles.carouselItem} ${isActive ? styles.carouselItemActive : ""}`}
             >
               {form.component}
             </motion.div>

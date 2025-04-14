@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useCliente } from "../context/ClienteContext";
+import { useRegistro } from "../context/RegistroContext";
 import styles from "../styles/formCard.module.css";
 
 const ClienteFormVisual = () => {
@@ -11,9 +11,9 @@ const ClienteFormVisual = () => {
     direccion: "",
   });
 
-  const { guardarCliente } = useCliente();
+  const { guardarCliente } = useRegistro();
 
-  // Recuperar del localStorage al cargar
+  // Recuperar datos del localStorage al cargar
   useEffect(() => {
     const storedData = localStorage.getItem("clienteForm");
     if (storedData) {
@@ -21,41 +21,24 @@ const ClienteFormVisual = () => {
     }
   }, []);
 
-  // Guardar en localStorage cada vez que cambia el formulario
+  // Guardar automáticamente en localStorage cuando el formulario cambia
   useEffect(() => {
-    const formCopy = { ...formData };
-    if (
-      Object.values(formCopy)
-        .flat()
-        .some((val) => val !== "") &&
-        formData.nombre !== ""
-    ) {
-      localStorage.setItem("clienteForm", JSON.stringify(formCopy));
+    if (formData.nombre.trim() !== "") {
+      localStorage.setItem("clienteForm", JSON.stringify(formData));
     }
   }, [formData]);
 
   const handleChange = (e) => {
-    const updated = { ...formData, [e.target.name]: e.target.value };
-    setFormData(updated);
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const clienteConId = {
-      ...formData,
-      _id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
-    };
-    console.log("Datos enviados al guardarCliente:", clienteConId);
-    guardarCliente(clienteConId);
-    setFormData({
-      nombre: "",
-      identificacion: "",
-      telefono: "",
-      email: "",
-      direccion: "",
-    });
-    localStorage.removeItem("clienteForm");
+
+    guardarCliente(formData);
+   
+    // NO limpiamos los campos para mantener la experiencia fluida
+    // localStorage.removeItem("clienteForm");
   };
 
   return (
@@ -63,21 +46,25 @@ const ClienteFormVisual = () => {
       <form className={styles.formCard} onSubmit={handleSubmit}>
         <h2>Formulario de Cliente</h2>
 
-        {["nombre", "identificacion", "telefono", "email", "direccion"].map(
-          (field) => (
-            <input
-              key={field}
-              type="text"
-              name={field}
-              placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-              onChange={handleChange}
-              required
-              value={formData[field]}
-            />
-          )
-        )}
+        {[
+          { name: "nombre", placeholder: "Nombre" },
+          { name: "identificacion", placeholder: "Identificación" },
+          { name: "telefono", placeholder: "Teléfono" },
+          { name: "email", placeholder: "Correo Electrónico" },
+          { name: "direccion", placeholder: "Dirección" },
+        ].map(({ name, placeholder }) => (
+          <input
+            key={name}
+            type="text"
+            name={name}
+            placeholder={placeholder}
+            value={formData[name]}
+            onChange={handleChange}
+            required
+          />
+        ))}
 
-        <button>Guardar Cliente</button>
+        <button type="submit">Siguiente</button>
       </form>
     </div>
   );

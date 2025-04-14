@@ -1,17 +1,17 @@
-import { ClienteProvider } from "../context/ClienteContext";
+import { RegistroProvider } from "../context/RegistroContext";
 import { AnimationProvider } from "../context/AnimationContext";
 import CarouselForm from "../components/CarouselForm";
 
 function RegisterPage() {
   return (
-    <ClienteProvider>
+    <RegistroProvider>
       <AnimationProvider>
         <div className="app-wrapper">
           <h1>Registrar Ordenes de Servicio</h1>
           <CarouselForm />
         </div>
       </AnimationProvider>
-    </ClienteProvider>
+    </RegistroProvider>
   );
 }
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useCliente } from "../context/ClienteContext";
+import { useRegistro } from "../context/RegistroContext";
 import "../styles/forms.css";
 import { useNavigate } from "react-router-dom";
 
@@ -12,7 +12,7 @@ const EquipoForm = ({ clienteId }) => {
     modelo: ""
   });
 
-  const { guardarEquipo, resetFlujo, resetAnimacion, finalizarRegistro } = useCliente();
+  const { guardarEquipo, resetFlujo, resetAnimacion, finalizarRegistro } = useRegistro();
   const navigate = useNavigate();
 
   useEffect(() => {
