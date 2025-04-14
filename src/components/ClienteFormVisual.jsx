@@ -17,7 +17,11 @@ const ClienteFormVisual = () => {
   useEffect(() => {
     const storedData = localStorage.getItem("clienteForm");
     if (storedData) {
-      setFormData(JSON.parse(storedData));
+      const parsedData = JSON.parse(storedData);
+      console.log("📥 ClienteForm - Datos cargados desde localStorage:", parsedData);
+      setFormData(parsedData);
+    } else {
+      console.log("📥 ClienteForm - No hay datos previos en localStorage.");
     }
   }, []);
 
@@ -34,10 +38,7 @@ const ClienteFormVisual = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     guardarCliente(formData);
-   
-    // NO limpiamos los campos para mantener la experiencia fluida
     // localStorage.removeItem("clienteForm");
   };
 

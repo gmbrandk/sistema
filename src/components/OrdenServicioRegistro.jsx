@@ -1,10 +1,16 @@
 import { useRegistro } from '../context/RegistroContext';
 import styles from '../styles/registro.module.css';
+import { useEffect } from 'react';
 
 const OrdenServicioRegistro = () => {
   const { ordenes } = useRegistro();
 
-  if (ordenes.length === 0) {
+  useEffect(() => {
+    console.log("📦 Órdenes recibidas en OrdenServicioRegistro:", ordenes);
+  }, [ordenes]);
+
+  if (!ordenes || ordenes.length === 0) {
+    console.warn("⚠️ No hay órdenes registradas o el array está vacío.");
     return <p>No hay órdenes registradas.</p>;
   }
 

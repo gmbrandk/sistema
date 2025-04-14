@@ -5,6 +5,7 @@ import ClienteFormVisual from "../components/ClienteFormVisual";
 import EquipoFormVisual from "../components/EquipoFormVisual";
 import OrdenServicioForm from "../components/OrdenServicioForm";
 import styles from "../styles/formCarousel.module.css";
+import LimpiarLocalStorage from "./LimpiarLocalStorage";
 
 const CarouselForm = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -117,6 +118,7 @@ const CarouselForm = () => {
       </button>
 
       <div className={styles.carouselInner}>
+      <LimpiarLocalStorage />
         <p style={{ fontSize: "12px", color: "gray", textAlign: "center" }}>
           Paso actual (debug): {currentIndex}
         </p>
