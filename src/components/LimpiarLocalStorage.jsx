@@ -16,11 +16,23 @@ const LimpiarLocalStorage = () => {
       console.log("🧹 LocalStorage limpiado correctamente.");
       alert("LocalStorage del sistema limpiado 🧼");
     };
-  
+
     return (
-      <button onClick={limpiarStorageDelSistema} style={{ margin: "1rem", padding: "0.5rem 1rem", backgroundColor: "#dc2626", color: "white", border: "none", borderRadius: "8px" }}>
+      <div>
+        <button onClick={limpiarStorageDelSistema} style={{ margin: "1rem", padding: "0.5rem 1rem", backgroundColor: "#dc2626", color: "white", border: "none", borderRadius: "8px" }}>
         Limpiar LocalStorage
+        </button>
+        <button
+          onClick={() => {
+            localStorage.clear(); // 💣 Borra todo el localStorage
+            alert("LocalStorage del sistema eliminado 💣");
+          }}
+          style={{ margin: "1rem", padding: "0.5rem 1rem", backgroundColor: "#dc2626", color: "white", border: "none", borderRadius: "8px" }}
+      >
+        Eliminar data
       </button>
+      </div>
+      
     );
   };
   

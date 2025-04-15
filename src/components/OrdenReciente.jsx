@@ -4,21 +4,41 @@ import styles from '../styles/registro.module.css';
 import { useEffect } from 'react';
 
 const OrdenServicioRegistro = () => {
-  const { ordenes } = useRegistro();
+  const { ordenes, ordenReciente, setOrdenReciente } = useRegistro();
   const navigate = useNavigate();
 
+  // 🔍 Log del montaje inicial
+  console.log("📥 Renderizando OrdenServicioRegistro");
+  console.log("🔄 ordenes:", ordenes);
+  console.log("🆕 ordenReciente:", ordenReciente);
+
   useEffect(() => {
-    console.log("📦 Órdenes recibidas en OrdenServicioRegistro:", ordenes);
-    console.log("🧪 Tipo de dato de 'ordenes':", typeof ordenes);
-    console.log("🧪 ¿Es array?", Array.isArray(ordenes));
+    console.log("🧩 useEffect ejecutado: ordenes cambió");
+    console.log("🔄 ordenes dentro de useEffect:", ordenes);
   }, [ordenes]);
+
+  useEffect(() => {
+    console.log("🧩 useEffect ejecutado: ordenReciente cambió");
+    console.log("🆕 ordenReciente:", ordenReciente);
+  }, [ordenReciente]);
+
+  useEffect(() => {
+    const orden = JSON.parse(localStorage.getItem("ordenReciente"));
+    if (orden) {
+      setOrdenReciente(orden);
+    }
+  }, []);
 
   if (!ordenes || !Array.isArray(ordenes) || ordenes.length === 0) {
     console.warn("⚠️ No hay órdenes registradas o el array está vacío.");
     return <p>No hay órdenes registradas.</p>;
   }
 
-  const ordenesOrdenadas = [...ordenes].sort(
+  const todasLasOrdenes = ordenReciente
+    ? [ordenReciente, ...ordenes.filter(o => o._id !== ordenReciente._id)]
+    : ordenes;
+
+  const ordenesOrdenadas = [...todasLasOrdenes].sort(
     (a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion)
   );
 

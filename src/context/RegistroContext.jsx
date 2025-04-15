@@ -121,6 +121,7 @@ export const RegistroProvider = ({ children }) => {
         setOrdenes,
         ordenReciente,
         guardarOrden,
+        setOrdenReciente
       }}
     >
       {children}

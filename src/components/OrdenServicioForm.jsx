@@ -16,7 +16,7 @@ const OrdenServicioForm = () => {
     garantia_dias: 30,
   });
 
-  const { clienteId, equipoId, guardarOrden, resetFlujo, resetAnimacion } = useRegistro();
+  const { clienteId, equipoId, guardarOrden, resetFlujo, resetAnimacion, agregarOrden } = useRegistro();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -69,6 +69,8 @@ const OrdenServicioForm = () => {
       setTimeout(() => {
         resetFlujo();
         resetAnimacion();
+
+        localStorage.setItem("ordenReciente", JSON.stringify(nuevaOrden));
         navigate('/registro');
         setFormData({
           
